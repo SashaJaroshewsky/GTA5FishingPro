@@ -19,13 +19,18 @@ namespace Fishing
         private static readonly InputSimulator _sim = new InputSimulator();
         private static readonly object _lockObject = new object();
         private static bool _isFishing = false;
-        private static int _fishSearchRegionPositionY = 290;
+        private static int _fishSearchRegionPositionY = 253;
         private static int _hookSearchRegionPositionY = 150;
         private static readonly Rectangle _hookSearchRegion = new Rectangle(939, _hookSearchRegionPositionY, 42, 620);
-        private static readonly Rectangle _fishSearchRegion = new Rectangle(260, _fishSearchRegionPositionY, 1400, 500);
+        //private static readonly Rectangle _fishSearchRegion = new Rectangle(338, _fishSearchRegionPositionY, 1400, 500);
+
+        private static readonly Rectangle _fishSearchRegion = new Rectangle(375, _fishSearchRegionPositionY, 1353, 500);
+
         private static readonly Rectangle _miniGameSearchRegion = new Rectangle(857, 42, 210, 70);
         private static readonly Rectangle _catchNotificationSearchRegion = new Rectangle(678, 957, 562, 64);
-        private static readonly Rectangle _fishAlertSearchRegion = new Rectangle(1857, 932, 45, 45);// Задайте координати та розміри
+        private static readonly Rectangle _fishAlertSearchRegion = new Rectangle(1861, 937, 36, 36);// Задайте координати та розміри
+        
+
 
         private static readonly List<string> _fishImagePaths = new List<string>
             {
@@ -44,7 +49,7 @@ namespace Fishing
 
         private static readonly string _fishAlertPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", "FishAlert.png");
 
-        private static HotKeyManager _hotKeyManager;
+        //private static HotKeyManager _hotKeyManager;
         static async Task Main(string[] args)
         {
             Console.WriteLine("Починається автоматизація риболовлі...");
@@ -119,6 +124,7 @@ namespace Fishing
                 {
                     //var screen = CaptureBottomRightCorner();
                     var screen = CaptureRegion(_fishAlertSearchRegion).CvtColor(ColorConversionCodes.BGR2GRAY);
+                    //var screen = CaptureFullScreen(/*_fishAlertSearchRegion*/).CvtColor(ColorConversionCodes.BGR2GRAY);
 
 
                     using (var result = new Mat())
