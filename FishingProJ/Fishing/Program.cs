@@ -255,7 +255,7 @@ namespace Fishing
                                 return; // Вихід, якщо гачок не знайдено
                             }
                         }
-                        await Task.Delay(100, cancellationTokenSource.Token); // Невелика затримка для контролю частоти оновлення
+                        await Task.Delay(10, cancellationTokenSource.Token); // Невелика затримка для контролю частоти оновлення
                     }
                 }
                 catch (TaskCanceledException)
