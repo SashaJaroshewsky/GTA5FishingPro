@@ -9,8 +9,7 @@ using System.Windows.Forms;
 using System.IO;
 using OpenCvSharp.Extensions;
 using System.Collections.Generic;
-using GlobalHotKey;
-using System.Windows.Input;
+
 
 namespace Fishing
 {
@@ -59,8 +58,8 @@ namespace Fishing
             await Task.Delay(5000);
             // Запускаємо основний цикл риболовлі та моніторинг клавіші виходу
             await Task.WhenAny(
-                Task.Run(FishingLoop),
-                Task.Run(MonitorExitKey)
+                Task.Run(FishingLoop)
+                //Task.Run(MonitorExitKey)
             );
         }
         //private static void HotKeyPressed(object sender, KeyPressedEventArgs e)
@@ -85,20 +84,20 @@ namespace Fishing
             }
         }
 
-        static async Task MonitorExitKey()
-        {
-            Console.WriteLine("Натисніть 'Q' для виходу.");
+        //static async Task MonitorExitKey()
+        //{
+        //    Console.WriteLine("Натисніть 'Q' для виходу.");
 
-            while (true)
-            {
-                if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Q)
-                {
-                    Environment.Exit(0);
-                }
+        //    while (true)
+        //    {
+        //        if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Q)
+        //        {
+        //            Environment.Exit(0);
+        //        }
 
-                await Task.Delay(200); // Асинхронна затримка замість Thread.Sleep
-            }
-        }
+        //        await Task.Delay(200); // Асинхронна затримка замість Thread.Sleep
+        //    }
+        //}
 
         static async Task StartFishing()
         {
@@ -193,7 +192,7 @@ namespace Fishing
                         Console.WriteLine("Міні гра завершена. Починаю рибалити знову");
                         return;
                     }
-                    await Task.Delay(50);
+                    await Task.Delay(100);
                 }
             }
         }
@@ -256,7 +255,7 @@ namespace Fishing
                                 return; // Вихід, якщо гачок не знайдено
                             }
                         }
-                        await Task.Delay(10, cancellationTokenSource.Token); // Невелика затримка для контролю частоти оновлення
+                        await Task.Delay(100, cancellationTokenSource.Token); // Невелика затримка для контролю частоти оновлення
                     }
                 }
                 catch (TaskCanceledException)
