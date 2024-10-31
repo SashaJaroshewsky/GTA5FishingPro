@@ -18,17 +18,40 @@ namespace Fishing
         private static readonly InputSimulator _sim = new InputSimulator();
         private static readonly object _lockObject = new object();
         private static bool _isFishing = false;
-        private static int _fishSearchRegionPositionY = 253;
         private static int _hookSearchRegionPositionY = 150;
-        private static readonly Rectangle _hookSearchRegion = new Rectangle(939, _hookSearchRegionPositionY, 42, 620);
-        //private static readonly Rectangle _fishSearchRegion = new Rectangle(338, _fishSearchRegionPositionY, 1400, 500);
+        private static readonly Rectangle _hookSearchRegion = new Rectangle(957, _hookSearchRegionPositionY, 6, 620);
 
-        private static readonly Rectangle _fishSearchRegion = new Rectangle(375, _fishSearchRegionPositionY, 1353, 500);
+
+        // private static readonly Rectangle _fishSearchRegion = new Rectangle(385, _fishSearchRegionPositionY, 1280, 460);
+
+        private static int _fishSearchRegionPositionY = 274;
+
+        private static readonly Rectangle[] _fishSearchRegion = new Rectangle[]
+        {
+            new Rectangle(385, _fishSearchRegionPositionY, 246, 460),
+            new Rectangle(1420, _fishSearchRegionPositionY, 246, 460)
+        };
+
 
         private static readonly Rectangle _miniGameSearchRegion = new Rectangle(857, 42, 210, 70);
         private static readonly Rectangle _catchNotificationSearchRegion = new Rectangle(678, 957, 562, 64);
         private static readonly Rectangle _fishAlertSearchRegion = new Rectangle(1861, 937, 36, 36);// Задайте координати та розміри
-        
+
+
+        //private static int _hookSearchRegionPositionY = 85;
+        //private static readonly Rectangle _hookSearchRegion = new Rectangle(638, _hookSearchRegionPositionY, 3, 413);
+
+        //private static int _fishSearchRegionPositionY = 193;
+        //private static readonly Rectangle[] _fishSearchRegion = new Rectangle[]
+        //{
+        //    new Rectangle(278, _fishSearchRegionPositionY, 164, 307),
+        //    new Rectangle(975, _fishSearchRegionPositionY, 164, 307)
+        //};
+
+        //private static readonly Rectangle _miniGameSearchRegion = new Rectangle(573, 31, 134, 21);
+        //private static readonly Rectangle _catchNotificationSearchRegion = new Rectangle(452, 637, 40, 40);
+        //private static readonly Rectangle _fishAlertSearchRegion = new Rectangle(1241, 624, 24, 24);
+
 
 
         private static readonly List<string> _fishImagePaths = new List<string>
@@ -41,25 +64,30 @@ namespace Fishing
                 Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Fish6.png")
             };
 
-        private static readonly string _hookImagePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Hook.png");
-        private static readonly string _miniGameImagePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", "MiniGame.png");
+        private static readonly List<Mat> _fishTemplates = LoadTemplates(_fishImagePaths);
 
-        private static readonly string _catchNotificationPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", "CatchNotification.png");
+        //private static readonly string _hookImagePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Hook.png");
+        //private static readonly string _miniGameImagePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", "MiniGame.png");
 
-        private static readonly string _fishAlertPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", "FishAlert.png");
+        //private static readonly string _catchNotificationPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", "CatchNotification.png");
 
-        //private static HotKeyManager _hotKeyManager;
+        //private static readonly string _fishAlertPath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", "FishAlert.png");
+
+
+        private static readonly Mat _hookTemplate = Cv2.ImRead(Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Hook.png"), ImreadModes.Grayscale);
+        private static readonly Mat _miniGameTemplate = Cv2.ImRead(Path.Combine(Directory.GetCurrentDirectory(), "Resources", "MiniGame.png"), ImreadModes.Grayscale);
+        private static readonly Mat _catchNotificationTemplate = Cv2.ImRead(Path.Combine(Directory.GetCurrentDirectory(), "Resources", "CatchNotification.png"), ImreadModes.Grayscale);
+        private static readonly Mat _fishAlertTemplate = Cv2.ImRead(Path.Combine(Directory.GetCurrentDirectory(), "Resources", "FishAlert.png"), ImreadModes.Grayscale);
+
+
         static async Task Main(string[] args)
         {
-            Console.WriteLine("Починається автоматизація риболовлі...");
-            //_hotKeyManager = new HotKeyManager();
-            //_hotKeyManager.Register(Key.Q, ModifierKeys.Control | ModifierKeys.Shift);
-            //_hotKeyManager.KeyPressed += HotKeyPressed;
+            Console.WriteLine("Починається процес авто рибо ловлі");
             await Task.Delay(5000);
             // Запускаємо основний цикл риболовлі та моніторинг клавіші виходу
             await Task.WhenAny(
-                Task.Run(FishingLoop)
-                //Task.Run(MonitorExitKey)
+                Task.Run(FishingLoop),
+                Task.Run(MonitorExitKey)
             );
         }
         //private static void HotKeyPressed(object sender, KeyPressedEventArgs e)
@@ -84,26 +112,44 @@ namespace Fishing
             }
         }
 
-        //static async Task MonitorExitKey()
+        static async Task MonitorExitKey()
+        {
+            Console.WriteLine("Натисніть 'Q' для виходу.");
+
+            while (true)
+            {
+                if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Q)
+                {
+                    Environment.Exit(0);
+                }
+
+                await Task.Delay(200); // Асинхронна затримка замість Thread.Sleep
+            }
+        }
+
+
+        //[DllImport("user32.dll", SetLastError = true)]
+        //private static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, int dwExtraInfo);
+
+        //private const int KEYEVENTF_KEYDOWN = 0x0000; // Натискання клавіші
+        //private const int KEYEVENTF_KEYUP = 0x0002;   // Відпускання клавіші
+        //private const byte VK_1 = 0x31;               // Код клавіші 1
+        //private const byte VK_E = 0x45;
+
+        //static async void PressKey(byte keyCode)
         //{
-        //    Console.WriteLine("Натисніть 'Q' для виходу.");
-
-        //    while (true)
-        //    {
-        //        if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.Q)
-        //        {
-        //            Environment.Exit(0);
-        //        }
-
-        //        await Task.Delay(200); // Асинхронна затримка замість Thread.Sleep
-        //    }
+        //    keybd_event(keyCode, 0, KEYEVENTF_KEYDOWN, 0); // Натискання клавіші
+        //    await Task.Delay(50); // Невелика затримка між натисканням і відпусканням
+        //    keybd_event(keyCode, 0, KEYEVENTF_KEYUP, 0);   // Відпускання клавіші
         //}
 
         static async Task StartFishing()
         {
             Console.WriteLine("Запуск риболовлі...");
-           
+
             _sim.Keyboard.KeyPress(VirtualKeyCode.VK_1);
+            //PressKey(VK_1);
+
             await Task.Delay(1000);
         }
 
@@ -112,121 +158,108 @@ namespace Fishing
             Console.WriteLine("Чекаємо на рибу...");
             //string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources", "FishAlert.png");
 
-            if (!File.Exists(_fishAlertPath))
-            {
-                throw new FileNotFoundException($"Файл {_fishAlertPath} не знайдено.");
-            }
 
-            using (var fishTemplate = Cv2.ImRead(_fishAlertPath, ImreadModes.Grayscale))
+            while (_isFishing)
             {
-                while (_isFishing)
+                //var screen = CaptureBottomRightCorner();
+                var screen = CaptureRegion(_fishAlertSearchRegion).CvtColor(ColorConversionCodes.BGR2GRAY);
+                //var screen = CaptureFullScreen(/*_fishAlertSearchRegion*/).CvtColor(ColorConversionCodes.BGR2GRAY);
+                if (CheckTemplateMatch(screen, _fishAlertTemplate, 0.8))
                 {
-                    //var screen = CaptureBottomRightCorner();
-                    var screen = CaptureRegion(_fishAlertSearchRegion).CvtColor(ColorConversionCodes.BGR2GRAY);
-                    //var screen = CaptureFullScreen(/*_fishAlertSearchRegion*/).CvtColor(ColorConversionCodes.BGR2GRAY);
-
-
-                    using (var result = new Mat())
-                    {
-                        Cv2.MatchTemplate(screen, fishTemplate, result, TemplateMatchModes.CCoeffNormed);
-                        Cv2.MinMaxLoc(result, out _, out double maxVal, out _, out OpenCvSharp.Point loc);
-
-                        if (maxVal >= 0.9)
-                        {
-                            Console.WriteLine($"Риба знайдена! x={loc.X}, y={loc.Y}");
-                            return;
-                        }
-                    }
-                    await Task.Delay(1000);
+                    return;
                 }
+
+                //using (var result = new Mat())
+                //{
+                //    Cv2.MatchTemplate(screen, _fishAlertTemplate, result, TemplateMatchModes.CCoeffNormed);
+                //    Cv2.MinMaxLoc(result, out _, out double maxVal, out _, out OpenCvSharp.Point loc);
+
+                //    if (maxVal >= 0.9)
+                //    {
+                //        Console.WriteLine($"Риба знайдена! x={loc.X}, y={loc.Y}");
+                //        return;
+                //    }
+                //}
+                await Task.Delay(1000);
             }
+
         }
 
         static async Task StartMiniGame()
         {
             Console.WriteLine("Запуск міні-гри...");
             _sim.Keyboard.KeyPress(VirtualKeyCode.VK_E);
-            
+
             await Task.Delay(200);
         }
 
         static async Task FollowFish()
         {
             Console.WriteLine("Відстежуємо рибу...");
-            
 
-            var fishTemplates = LoadTemplates(_fishImagePaths);
-            var miniGameTemplates = Cv2.ImRead(_miniGameImagePath, ImreadModes.Grayscale);
-            if (fishTemplates.Count == 0 || !File.Exists(_hookImagePath))
+            while (_isFishing)
             {
-                throw new FileNotFoundException("Не знайдено шаблони рибок або гачка.");
-            }
+                //var screen = CaptureFullScreen().CvtColor(ColorConversionCodes.BGR2GRAY);
 
-            using (var hookTemplate = Cv2.ImRead(_hookImagePath, ImreadModes.Grayscale))
-            {
-               
-                while (_isFishing)
+                Mat[] screens = new Mat[] { CaptureRegion(_fishSearchRegion[0]).CvtColor(ColorConversionCodes.BGR2GRAY), CaptureRegion(_fishSearchRegion[1]).CvtColor(ColorConversionCodes.BGR2GRAY) };
+                //var screen = CaptureRegion(_fishSearchRegion).CvtColor(ColorConversionCodes.BGR2GRAY);
+
+                //var screen = CaptureFullScreen().CvtColor(ColorConversionCodes.BGR2GRAY);
+                //var screenMiniGame = CaptureFullScreen().CvtColor(ColorConversionCodes.BGR2GRAY);
+                foreach (var screen in screens)
                 {
-                    //var screen = CaptureFullScreen().CvtColor(ColorConversionCodes.BGR2GRAY);
-                    var screen = CaptureRegion(_fishSearchRegion).CvtColor(ColorConversionCodes.BGR2GRAY);
-                    var screenMiniGame = CaptureRegion(_miniGameSearchRegion).CvtColor(ColorConversionCodes.BGR2GRAY); ;
-                    //var screenMiniGame = CaptureFullScreen().CvtColor(ColorConversionCodes.BGR2GRAY);
-                    foreach (var fishTemplate in fishTemplates)
+                    foreach (var fishTemplate in _fishTemplates)
                     {
-                        using (var result = new Mat())
+                        if (CheckTemplateMatch(screen, fishTemplate, 0.7, out OpenCvSharp.Point location))
                         {
-                            Cv2.MatchTemplate(screen, fishTemplate, result, TemplateMatchModes.CCoeffNormed);
-                            Cv2.MinMaxLoc(result, out _, out double maxVal, out _, out OpenCvSharp.Point fishLoc);
-
-                            if (maxVal >= 0.8)
-                            {
-                                
-                                await HookControlLoop(fishLoc.Y + _fishSearchRegionPositionY+10);
-                                break;
-                            }
+                            Console.WriteLine("Риба пливе");
+                            await HookControlLoop(location.Y + _fishSearchRegionPositionY + 10);
+                            break;
                         }
                     }
 
-                    if (!CheckMiniGame(screenMiniGame, miniGameTemplates))
-                    {
-                        Console.WriteLine("Міні гра завершена. Починаю рибалити знову");
-                        return;
-                    }
-                    await Task.Delay(100);
                 }
+
+                var screenMiniGame = CaptureRegion(_miniGameSearchRegion).CvtColor(ColorConversionCodes.BGR2GRAY); 
+                //var screenMiniGame = CaptureFullScreen().CvtColor(ColorConversionCodes.BGR2GRAY);
+                if (!CheckTemplateMatch(screenMiniGame, _miniGameTemplate, 0.8))
+                {
+                    Console.WriteLine($"Міні гра завершена. Починаю рибалити знову");
+                   return;
+                }
+                await Task.Delay(100);
+
             }
         }
 
         static async Task WaitForCatchNotification()
         {
             Console.WriteLine("Чекаємо на повідомлення про спійману рибу...");
-            
 
-            if (!File.Exists(_catchNotificationPath))
-            {
-                throw new FileNotFoundException($"Файл {_catchNotificationPath} не знайдено.");
-            }
 
-            using (var catchTemplate = Cv2.ImRead(_catchNotificationPath, ImreadModes.Grayscale))
+            while (_isFishing)
             {
-                while (_isFishing)
+                var screen = CaptureRegion(_catchNotificationSearchRegion).CvtColor(ColorConversionCodes.BGR2GRAY);
+                //var screen = CaptureFullScreen().CvtColor(ColorConversionCodes.BGR2GRAY);
+                if (CheckTemplateMatch(screen, _catchNotificationTemplate, 0.8))
                 {
-                    //var screen = CaptureRegion(_catchNotificationSearchRegion).CvtColor(ColorConversionCodes.BGR2GRAY);
-                    var screen = CaptureFullScreen().CvtColor(ColorConversionCodes.BGR2GRAY);
-                    using (var result = new Mat())
-                    {
-                        Cv2.MatchTemplate(screen, catchTemplate, result, TemplateMatchModes.CCoeffNormed);
-                        Cv2.MinMaxLoc(result, out _, out double maxVal, out _, out OpenCvSharp.Point matchLoc);
-
-                        if (maxVal >= 0.8)
-                        {
-                            Console.WriteLine($"Повідомлення про спійману рибу знайдено! x={matchLoc.X}, y={matchLoc.Y}");
-                            await Task.Delay(1000);
-                            return;
-                        }
-                    }
-                    await Task.Delay(500);
+                    Console.WriteLine($"Повідомлення про спійману рибу знайдено! ");
+                    return;
                 }
+                //using (var result = new Mat())
+                //{
+                //    Cv2.MatchTemplate(screen, _catchNotificationTemplate, result, TemplateMatchModes.CCoeffNormed);
+                //    Cv2.MinMaxLoc(result, out _, out double maxVal, out _, out OpenCvSharp.Point matchLoc);
+
+                //    if (maxVal >= 0.8)
+                //    {
+                //        Console.WriteLine($"Повідомлення про спійману рибу знайдено! x={matchLoc.X}, y={matchLoc.Y}");
+                //        await Task.Delay(1000);
+                //        return;
+                //    }
+                //}
+                await Task.Delay(500);
+
             }
         }
 
@@ -242,19 +275,25 @@ namespace Fishing
                     while (isFishDetected && _isFishing && !cancellationTokenSource.Token.IsCancellationRequested)
                     {
                         var screen = CaptureRegion(_hookSearchRegion).CvtColor(ColorConversionCodes.BGR2GRAY);
-                        using (var hookTemplate = Cv2.ImRead(_hookImagePath, ImreadModes.Grayscale))
+                        //using (var hookTemplate = Cv2.ImRead(_hookImagePath, ImreadModes.Grayscale))
+                        //{
+
+                        if (CheckTemplateMatch(screen, _hookTemplate, 0.7, out OpenCvSharp.Point location))
                         {
-                            int hookY = GetHookPositionY(screen, hookTemplate);
-                            if (hookY != -1)
-                            {
-                                Console.WriteLine($"Рухаємо гачок. Риба на позиції: Y = {fishYPosition}, Гачок на позиції: Y = {hookY}");
-                                await MoveHookToFish(fishYPosition, hookY);
-                            }
-                            else
-                            {
-                                return; // Вихід, якщо гачок не знайдено
-                            }
+                            await MoveHookToFish(fishYPosition, location.Y + _hookSearchRegionPositionY);
                         }
+                        else return;
+                        //int hookY = GetHookPositionY(screen, _hookTemplate);
+                        //if (hookY != -1)
+                        //{
+                        //    Console.WriteLine($"Рухаємо гачок. Риба на позиції: Y = {fishYPosition}, Гачок на позиції: Y = {hookY}");
+                        //    await MoveHookToFish(fishYPosition, hookY);
+                        //}
+                        //else
+                        //{
+                        //    return; // Вихід, якщо гачок не знайдено
+                        //}
+                        //}
                         await Task.Delay(10, cancellationTokenSource.Token); // Невелика затримка для контролю частоти оновлення
                     }
                 }
@@ -267,8 +306,8 @@ namespace Fishing
 
         static async Task MoveHookToFish(int fishY, int hookY)
         {
-            if (hookY == -1) return;
-            
+            //if (hookY == -1) return;
+
             const int threshold = 0; // Зменшено поріг для більш точного керування
 
             if (fishY >= hookY + threshold)
@@ -286,8 +325,8 @@ namespace Fishing
         static async Task PressRightMouseButton()
         {
             lock (_lockObject)
-            {  
-                   _sim.Mouse.RightButtonDown();
+            {
+                _sim.Mouse.RightButtonDown();
             }
             await Task.Delay(1); // Мінімальна затримка для стабільності
         }
@@ -296,7 +335,7 @@ namespace Fishing
         {
             lock (_lockObject)
             {
-                  _sim.Mouse.RightButtonUp();
+                _sim.Mouse.RightButtonUp();
             }
             await Task.Delay(1); // Мінімальна затримка для стабільності
         }
@@ -325,11 +364,55 @@ namespace Fishing
             }
         }
 
-       
+        static bool CheckTemplateMatch(Mat screen, Mat template, double threshold)
+        {
+            using (var result = new Mat())
+            {
+                Cv2.MatchTemplate(screen, template, result, TemplateMatchModes.CCoeffNormed /*TemplateMatchModes.SqDiff*/);
+                Cv2.MinMaxLoc(result, out _, out double maxVal, out _, out _);
+                return maxVal >= threshold;
+            }
+        }
+
+        //static bool CheckTemplateMatch(Mat screen, Mat template, double thresholdPercentage)
+        //{
+        //    using (var result = new Mat())
+        //    {
+        //        Cv2.MatchTemplate(screen, template, result, TemplateMatchModes.SqDiff);
+        //        Cv2.MinMaxLoc(result, out double minVal, out _, out _, out _);
+
+        //        // Обчислюємо максимальне можливе значення для шаблону
+        //        double maxPossibleValue = Math.Pow(255.0, 2) * (template.Rows * template.Cols);
+
+        //        // Обчислюємо відсоток відповідності
+        //        double similarity = 1 - (minVal / maxPossibleValue);
+
+        //        // Переводимо відсоток у значення від 0 до 100
+        //        double similarityPercentage = similarity;
+
+        //        Console.WriteLine($"Відсоток відповідності: {similarityPercentage}%");
+
+        //        return similarityPercentage >= 0;
+        //    }
+        //}
+
+        static bool CheckTemplateMatch(Mat screen, Mat template, double threshold, out OpenCvSharp.Point Location)
+        {
+            using (var result = new Mat())
+            {
+                Cv2.MatchTemplate(screen, template, result, TemplateMatchModes.CCoeffNormed /*TemplateMatchModes.SqDiff*/);
+                Cv2.MinMaxLoc(result, out _, out double maxVal, out _, out OpenCvSharp.Point Loc);
+                Location = Loc;
+
+                Console.WriteLine($"Співпадіння = {maxVal}");
+                return maxVal >= threshold;
+            }
+        }
+
 
         static bool CheckMiniGame(Mat screen, Mat miniGameTemplate)
         {
-            using(var result = new Mat())
+            using (var result = new Mat())
             {
                 Cv2.MatchTemplate(screen, miniGameTemplate, result, TemplateMatchModes.CCoeffNormed);
                 Cv2.MinMaxLoc(result, out _, out double maxVal, out _, out OpenCvSharp.Point hookLoc);
