@@ -23,6 +23,8 @@ namespace FishingBot.App.Configuration
         public Mat FishAlertTemplate { get; }
         public double TemplateMatchThreshold { get; }
 
+        public double HookTemplateMatchThreshold { get; }
+
         public AppConfiguration()
         {
             HookSearchRegion = new Region(958, 160, 4, 600);
@@ -52,6 +54,7 @@ namespace FishingBot.App.Configuration
             FishAlertTemplate = Cv2.ImRead(Path.Combine(Directory.GetCurrentDirectory(), "Resources", "FishAlert.png"), ImreadModes.Grayscale);
 
             TemplateMatchThreshold = 0.8;
+            HookTemplateMatchThreshold = 0.7;
         }   
 
             

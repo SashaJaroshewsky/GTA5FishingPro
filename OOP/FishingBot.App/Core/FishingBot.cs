@@ -155,7 +155,7 @@ namespace FishingBot.App.Core
                 {
                     var screen = _screenCapture.CaptureRegion(_config.HookSearchRegion).CvtColor(ColorConversionCodes.BGR2GRAY);
 
-                    if (_templateMatching.CheckTemplateMatch(screen, _config.HookImageTemplate, _config.TemplateMatchThreshold, out Point location))
+                    if (_templateMatching.CheckTemplateMatch(screen, _config.HookImageTemplate, _config.HookTemplateMatchThreshold, out Point location))
                     {
                         int hookY = location.Y + _config.HookSearchRegion.Y;
                         await MoveHookToFish(fishY, hookY);
