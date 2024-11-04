@@ -3,9 +3,6 @@ using OpenCvSharp;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FishingBot.App.Configuration
 {
@@ -24,6 +21,8 @@ namespace FishingBot.App.Configuration
         public double TemplateMatchThreshold { get; }
 
         public double HookTemplateMatchThreshold { get; }
+        public double CatchNotificationThreshold { get; }
+        public double MiniGameNotificationThreshold { get; }
 
         public AppConfiguration()
         {
@@ -35,29 +34,31 @@ namespace FishingBot.App.Configuration
             };
             MiniGameSearchRegion = new Region(857, 42, 210, 70);
             CatchNotificationRegion = new Region(48, 738, 22, 22);
-            FishAlertRegion = new Region(1831, 893, 6, 28);
+            FishAlertRegion = new Region(1832, 893, 6, 28);
 
             List<string> fishImagePaths = new List<string>
             {
-                Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Fish1.png"),
-                Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Fish2.png"),
-                Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Fish3.png"),
-                Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Fish4.png"),
-                Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Fish5.png"),
-                Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Fish6.png")
+                Path.Combine(AppContext.BaseDirectory, "Resources", "Fish1.png"),
+                Path.Combine(AppContext.BaseDirectory, "Resources", "Fish2.png"),
+                Path.Combine(AppContext.BaseDirectory, "Resources", "Fish3.png"),
+                Path.Combine(AppContext.BaseDirectory, "Resources", "Fish4.png"),
+                Path.Combine(AppContext.BaseDirectory, "Resources", "Fish5.png"),
+                Path.Combine(AppContext.BaseDirectory, "Resources", "Fish6.png")
             };
 
             FishImageTemplate = LoadTemplates(fishImagePaths);
-            HookImageTemplate = Cv2.ImRead(Path.Combine(Directory.GetCurrentDirectory(), "Resources", "Hook.png"), ImreadModes.Grayscale);
-            MiniGameImageTemplate = Cv2.ImRead(Path.Combine(Directory.GetCurrentDirectory(), "Resources", "MiniGame.png"), ImreadModes.Grayscale);
-            CatchNotificationTemplate = Cv2.ImRead(Path.Combine(Directory.GetCurrentDirectory(), "Resources", "CatchNotification.png"), ImreadModes.Grayscale);
-            FishAlertTemplate = Cv2.ImRead(Path.Combine(Directory.GetCurrentDirectory(), "Resources", "FishAlert.png"), ImreadModes.Grayscale);
+            HookImageTemplate = Cv2.ImRead(Path.Combine(AppContext.BaseDirectory, "Resources", "Hook.png"), ImreadModes.Grayscale);
+            MiniGameImageTemplate = Cv2.ImRead(Path.Combine(AppContext.BaseDirectory, "Resources", "MiniGame.png"), ImreadModes.Grayscale);
+            CatchNotificationTemplate = Cv2.ImRead(Path.Combine(AppContext.BaseDirectory, "Resources", "CatchNotification.png"), ImreadModes.Grayscale);
+            FishAlertTemplate = Cv2.ImRead(Path.Combine(AppContext.BaseDirectory, "Resources", "FishAlert.png"), ImreadModes.Grayscale);
 
             TemplateMatchThreshold = 0.8;
             HookTemplateMatchThreshold = 0.7;
-        }   
+            CatchNotificationThreshold = 0.9;
+            MiniGameNotificationThreshold = 0.8;
+        }
 
-            
+
         static List<Mat> LoadTemplates(List<string> paths)
         {
             var templates = new List<Mat>();
