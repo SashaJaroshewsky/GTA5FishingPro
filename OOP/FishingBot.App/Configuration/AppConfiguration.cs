@@ -55,7 +55,7 @@ namespace FishingBot.App.Configuration
             TemplateMatchThreshold = 0.8;
             HookTemplateMatchThreshold = 0.7;
             CatchNotificationThreshold = 0.9;
-            MiniGameNotificationThreshold = 0.8;
+            MiniGameNotificationThreshold = 0.92;
         }
 
 

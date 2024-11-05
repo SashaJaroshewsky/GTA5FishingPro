@@ -30,17 +30,20 @@ namespace FishingBot.App.Core
 
         public async Task StartFishingLoop()
         {
+            Console.WriteLine("Починається процес автоматичної риболовлі");
+            await Task.Delay(5000);
+
             while (true)
             {
                 try
                 {
-                    await StartFishing();
-                    await WaitForCatchNotification();
-                    await WaitForFish();
+                    await CastFishingRod();
+                    //await WaitForCatchNotification();
+                    WaitForFish();
                     await StartMiniGame();
-                    await Task.Delay(2000);
+                    await Task.Delay(1000);
                     await FollowFish();
-                    await WaitForCatchNotification();
+                    WaitForCatchNotification();
                     await Task.Delay(400);
                 }
                 catch (Exception ex)
@@ -51,27 +54,28 @@ namespace FishingBot.App.Core
             }
         }
 
-        private async Task StartFishing()
+        private async Task CastFishingRod()
         {
-            Console.WriteLine("Запуск риболовлі...");
-            await _inputSimulation.PressKey(VirtualKeyCode.VK_1);
+            Console.WriteLine("Закидаю вудку...");
+            _inputSimulation.PressKey(VirtualKeyCode.VK_1);
             await Task.Delay(1000);
         }
 
 
 
 
-        private async Task WaitForFish()
+        private void WaitForFish()
         {
             Console.WriteLine("Чекаємо на рибу...");
-            await _messageTracker.TrackMessage(_config.FishAlertRegion, _config.FishAlertTemplate, _config.TemplateMatchThreshold);
+            _messageTracker.TrackMessageCycle(_config.FishAlertRegion, _config.FishAlertTemplate, _config.TemplateMatchThreshold);
             Console.WriteLine("Вона поблизу!");
 
         }
 
         private async Task<bool> CheckingMiniGameActivity()
         {
-            if (await _messageTracker.TrackMessage(_config.MiniGameSearchRegion, _config.MiniGameImageTemplate, _config.MiniGameNotificationThreshold))
+            await Task.Delay(300);
+            if (_messageTracker.TrackMessage(_config.MiniGameSearchRegion, _config.MiniGameImageTemplate, _config.MiniGameNotificationThreshold))
             {
                 Console.WriteLine("Міні гра відкрита");
                 return true;
@@ -86,32 +90,24 @@ namespace FishingBot.App.Core
         private async Task StartMiniGame()
         {
             Console.WriteLine("Запуск міні-гри...");
-            await _inputSimulation.PressKey(VirtualKeyCode.VK_E);
+            _inputSimulation.PressKey(VirtualKeyCode.VK_E);
             await Task.Delay(200);
         }
 
         private async Task FollowFish()
-        {
-            Console.WriteLine("Де ж вона пливе...");
-           
-            while (true)
+        {  
+            while (await CheckingMiniGameActivity())
             {
-                if (!await CheckingMiniGameActivity())
-                {
-                    return;
-                }
-
                 int fishPosition = await _fishTracker.FishTracking();
-                Console.WriteLine("Ось вона. Починаю рибалити");
-                await _hookController.ControlHook(fishPosition);
-                break;
+                _hookController.ControlHook(fishPosition);
             }
+            Console.WriteLine("Риба піймана");
         }
 
-        private async Task WaitForCatchNotification()
+        private void WaitForCatchNotification()
         {
             Console.WriteLine("Чекаємо на підтвердження...");
-            await _messageTracker.TrackMessage(_config.CatchNotificationRegion, _config.CatchNotificationTemplate, _config.CatchNotificationThreshold);
+            _messageTracker.TrackMessageCycle(_config.CatchNotificationRegion, _config.CatchNotificationTemplate, _config.CatchNotificationThreshold);
             Console.WriteLine("Повідомлення зенайденно!");
         }
     }

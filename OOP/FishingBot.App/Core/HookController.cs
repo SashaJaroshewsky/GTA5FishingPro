@@ -19,9 +19,9 @@ namespace FishingBot.App.Core
             _config = configuration;
             _imageComparator = imageComparator;
         }
-        public async Task ControlHook(int fishY)
+        public void ControlHook(int fishY)
         {
-            await _inputSimulation.ClickLeftMouseButton();
+             _inputSimulation.ClickLeftMouseButton();
 
             var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(3));
             try
@@ -31,9 +31,9 @@ namespace FishingBot.App.Core
                     if (_imageComparator.CompareImageWithRegion(_config.HookSearchRegion, _config.HookImageTemplate, _config.HookTemplateMatchThreshold, out Point location))
                     {
                         int hookY = location.Y + _config.HookSearchRegion.Y;
-                        await MoveHookToFish(fishY, hookY);
+                        MoveHookToFish(fishY, hookY);
                     }
-                    await Task.Delay(1, cancellationTokenSource.Token);
+                     Task.Delay(1, cancellationTokenSource.Token);
                 }
             }
             catch (TaskCanceledException)
@@ -43,16 +43,19 @@ namespace FishingBot.App.Core
             }
         }
 
-        private async Task MoveHookToFish(int fishY, int hookY)
+        private void MoveHookToFish(int fishY, int hookY)
         {
             if (fishY >= hookY)
             {
-                await _inputSimulation.PressRightMouseButton();
+                 _inputSimulation.PressRightMouseButton();
             }
             else
             {
-                await _inputSimulation.ReleaseRightMouseButton();
+                _inputSimulation.ReleaseRightMouseButton();
             }
         }
+
+
+
     }
 }

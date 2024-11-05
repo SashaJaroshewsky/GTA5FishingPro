@@ -18,8 +18,6 @@ namespace FishingBot.App
 
             var fishingBot = services.GetRequiredService<Core.FishingBot>();
 
-            Console.WriteLine("Починається процес автоматичної риболовлі");
-            await Task.Delay(5000);
             await Task.WhenAny(
                 fishingBot.StartFishingLoop(),
                 MonitorExitKey()

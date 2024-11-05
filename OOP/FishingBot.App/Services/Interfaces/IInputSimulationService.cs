@@ -5,9 +5,9 @@ namespace FishingBot.App.Services.Interfaces
 {
     internal interface IInputSimulationService
     {
-        Task PressKey(VirtualKeyCode keyCode);
-        Task ClickLeftMouseButton();
-        Task PressRightMouseButton();
-        Task ReleaseRightMouseButton();
+        void PressKey(VirtualKeyCode keyCode);
+        void ClickLeftMouseButton();
+        void PressRightMouseButton();
+        void ReleaseRightMouseButton();
     }
 }

@@ -15,14 +15,22 @@ namespace FishingBot.App.Core
             _imageComparator = imageComparator;
         }
 
-        public async Task<bool> TrackMessage(Models.Region region, Mat target, double threshold)
+        public bool TrackMessageCycle(Models.Region region, Mat target, double threshold)
         {
             while (true)
             {
                 if (_imageComparator.CompareImageWithRegion(region, target, threshold))
                     return true;
-                await Task.Delay(1000);
+                Task.Delay(1000);
             }
+        }
+
+        public bool TrackMessage(Models.Region region, Mat target, double threshold)
+        {
+            //if (_imageComparator.CompareImageWithRegion(region, target, threshold))
+            //    return true;
+            //return false;
+            return _imageComparator.CompareImageWithRegion(region, target, threshold);
         }
     }
 }

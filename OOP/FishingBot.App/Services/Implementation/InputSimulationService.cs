@@ -15,37 +15,37 @@ namespace FishingBot.App.Services.Implementation
             _sim = new InputSimulator();
         }
 
-        public async Task PressKey(VirtualKeyCode keyCode)
+        public void PressKey(VirtualKeyCode keyCode)
         {
             _sim.Keyboard.KeyPress(keyCode);
-            await Task.Delay(50);
+            Task.Delay(50);
         }
 
-        public async Task ClickLeftMouseButton()
+        public void ClickLeftMouseButton()
         {
             lock (_lockObject)
             {
                 _sim.Mouse.LeftButtonClick();
             }
-            await Task.Delay(50);
+            Task.Delay(50);
         }
 
-        public async Task PressRightMouseButton()
+        public void PressRightMouseButton()
         {
             lock (_lockObject)
             {
                 _sim.Mouse.RightButtonDown();
             }
-            await Task.Delay(1);
+            Task.Delay(1);
         }
 
-        public async Task ReleaseRightMouseButton()
+        public void ReleaseRightMouseButton()
         {
             lock (_lockObject)
             {
                 _sim.Mouse.RightButtonUp();
             }
-            await Task.Delay(1);
+            Task.Delay(1);
         }
     }
 }
