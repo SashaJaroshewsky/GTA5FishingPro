@@ -1,4 +1,5 @@
-﻿using FishingBot.App.Configuration;
+﻿
+using FishingBot.App.Services.Implementation;
 using FishingBot.App.Services.Interfaces;
 using OpenCvSharp;
 using System;
@@ -10,10 +11,10 @@ namespace FishingBot.App.Core
     internal class HookController
     {
         private readonly IInputSimulationService _inputSimulation;
-        private readonly AppConfiguration _config;
+        private readonly IAppConfigurationService _config;
         private readonly IImageComparatorService _imageComparator;
 
-        public HookController(IInputSimulationService inputSimulation, AppConfiguration configuration, IImageComparatorService imageComparator)
+        public HookController(IInputSimulationService inputSimulation, IAppConfigurationService configuration, IImageComparatorService imageComparator)
         {
             _inputSimulation = inputSimulation;
             _config = configuration;

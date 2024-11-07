@@ -4,7 +4,7 @@ using System;
 
 namespace FishingBot.App.Services.Implementation
 {
-    internal class ImageComparatorService: IImageComparatorService
+    internal class ImageComparatorService : IImageComparatorService
     {
         private readonly IScreenCaptureService _screenCapture;
         private readonly ITemplateMatchingService _templateMatching;
@@ -17,28 +17,28 @@ namespace FishingBot.App.Services.Implementation
 
         public bool CompareImageWithRegion(Models.Region region, Mat target, double threshold)
         {
-            var screen = _screenCapture.CaptureRegion(region).CvtColor(ColorConversionCodes.BGR2GRAY);
-
-            if (_templateMatching.CheckTemplateMatch(screen, target, threshold/*, out Point location*/))
+            using (var screen = _screenCapture.CaptureRegion(region).CvtColor(ColorConversionCodes.BGR2GRAY))
             {
-                return true;
+                if (_templateMatching.CheckTemplateMatch(screen, target, threshold))
+                {
+                    return true;
+                }
+                return false;
             }
-            return false;
-
         }
 
         public bool CompareImageWithRegion(Models.Region region, Mat target, double threshold, out Point location)
         {
-            var screen = _screenCapture.CaptureRegion(region).CvtColor(ColorConversionCodes.BGR2GRAY);
-
-            if (_templateMatching.CheckTemplateMatch(screen, target, threshold, out Point loc))
+            using (var screen = _screenCapture.CaptureRegion(region).CvtColor(ColorConversionCodes.BGR2GRAY))
             {
-                location = loc; 
-                return true;
+                if (_templateMatching.CheckTemplateMatch(screen, target, threshold, out Point loc))
+                {
+                    location = loc;
+                    return true;
+                }
+                location = loc;
+                return false;
             }
-            location = loc;
-            return false;
-
         }
     }
 }

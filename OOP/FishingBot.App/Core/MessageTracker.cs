@@ -1,6 +1,8 @@
-﻿using FishingBot.App.Configuration;
+﻿
 using FishingBot.App.Services.Interfaces;
 using OpenCvSharp;
+using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FishingBot.App.Core
@@ -15,13 +17,29 @@ namespace FishingBot.App.Core
             _imageComparator = imageComparator;
         }
 
-        public bool TrackMessageCycle(Models.Region region, Mat target, double threshold)
+        public async Task TrackMessageCycle(Models.Region region, Mat target, double threshold)
         {
             while (true)
             {
-                if (_imageComparator.CompareImageWithRegion(region, target, threshold))
-                    return true;
-                Task.Delay(1000);
+                if (_imageComparator.CompareImageWithRegion(region, target, threshold, out Point l))
+                {
+                    Console.WriteLine($"location: {l.X} {l.Y}");
+                    return;
+                }
+                await Task.Delay(1000);
+            }
+        }
+
+        public async Task TrackMessageCycle(Models.Region region, Mat target, double threshold, CancellationToken token)
+        {
+            while (true)
+            {
+                if (_imageComparator.CompareImageWithRegion(region, target, threshold, out Point l))
+                {
+                    Console.WriteLine($"location: {l.X} {l.Y}");
+                    return;
+                }
+                await Task.Delay(1000, token);
             }
         }
 

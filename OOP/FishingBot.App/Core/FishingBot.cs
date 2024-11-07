@@ -1,6 +1,8 @@
-﻿using FishingBot.App.Configuration;
+﻿
+using FishingBot.App.Services.Implementation;
 using FishingBot.App.Services.Interfaces;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using WindowsInput.Native;
 
@@ -9,47 +11,54 @@ namespace FishingBot.App.Core
     internal class FishingBot
     {
         private readonly IInputSimulationService _inputSimulation;
-        private readonly AppConfiguration _config;
+        private readonly IAppConfigurationService _config;
         private readonly FishTracker _fishTracker;
         private readonly HookController _hookController;
         private readonly MessageTracker _messageTracker;
 
+        
+
         public FishingBot(
             IInputSimulationService inputSimulation,
-            AppConfiguration config,
+            IAppConfigurationService config,
             MessageTracker messageTracker,
             FishTracker fishTracker,
-            HookController hookController)
+            HookController hookController
+            )
         {
             _inputSimulation = inputSimulation;
             _config = config;
             _messageTracker = messageTracker;
             _fishTracker = fishTracker;
             _hookController = hookController;
+           ;
         }
 
-        public async Task StartFishingLoop()
+        public async Task StartFishingLoop(CancellationToken token)
         {
             Console.WriteLine("Починається процес автоматичної риболовлі");
-            await Task.Delay(5000);
 
-            while (true)
+
+            while (!token.IsCancellationRequested)
             {
                 try
                 {
+                    await Task.Delay(10);
                     await CastFishingRod();
-                    //await WaitForCatchNotification();
-                    WaitForFish();
+                    await Task.Delay(10);
+                    await WaitForFish();
                     await StartMiniGame();
                     await Task.Delay(1000);
                     await FollowFish();
-                    WaitForCatchNotification();
-                    await Task.Delay(400);
+                    await WaitForCatchNotification(token);
+                }
+                catch (TaskCanceledException)
+                {
+                    Console.WriteLine("Риболовлю зупинено вручну");
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Помилка під час риболовлі: {ex.Message}");
-                    await Task.Delay(1000);
                 }
             }
         }
@@ -64,17 +73,17 @@ namespace FishingBot.App.Core
 
 
 
-        private void WaitForFish()
+        private async Task WaitForFish()
         {
             Console.WriteLine("Чекаємо на рибу...");
-            _messageTracker.TrackMessageCycle(_config.FishAlertRegion, _config.FishAlertTemplate, _config.TemplateMatchThreshold);
-            Console.WriteLine("Вона поблизу!");
 
+            
+            await _messageTracker.TrackMessageCycle( _config.FishAlertRegion, _config.FishAlertTemplate, _config.TemplateMatchThreshold);
         }
 
         private async Task<bool> CheckingMiniGameActivity()
         {
-            await Task.Delay(300);
+            await Task.Delay(500);
             if (_messageTracker.TrackMessage(_config.MiniGameSearchRegion, _config.MiniGameImageTemplate, _config.MiniGameNotificationThreshold))
             {
                 Console.WriteLine("Міні гра відкрита");
@@ -99,16 +108,17 @@ namespace FishingBot.App.Core
             while (await CheckingMiniGameActivity())
             {
                 int fishPosition = await _fishTracker.FishTracking();
+              
                 _hookController.ControlHook(fishPosition);
             }
             Console.WriteLine("Риба піймана");
         }
 
-        private void WaitForCatchNotification()
+        private async Task WaitForCatchNotification(CancellationToken token)
         {
+           
             Console.WriteLine("Чекаємо на підтвердження...");
-            _messageTracker.TrackMessageCycle(_config.CatchNotificationRegion, _config.CatchNotificationTemplate, _config.CatchNotificationThreshold);
-            Console.WriteLine("Повідомлення зенайденно!");
+            await _messageTracker.TrackMessageCycle(_config.CatchNotificationRegion, _config.CatchNotificationTemplate, _config.CatchNotificationThreshold, token);
         }
     }
 }

@@ -25,11 +25,12 @@
     <UpdateIntervalUnits>Days</UpdateIntervalUnits>
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
+    <MapFileExtensions>false</MapFileExtensions>
     <TargetCulture>uk-UA</TargetCulture>
+    <ProductName>Fish</ProductName>
     <PublisherName>Alex</PublisherName>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
-    <ApplicationRevision>6</ApplicationRevision>
+    <ApplicationRevision>19</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <CreateDesktopShortcut>true</CreateDesktopShortcut>
@@ -79,6 +80,9 @@
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="GlobalHotKey, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GlobalHotKey.1.1.0\lib\GlobalHotKey.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.8.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
@@ -129,12 +133,15 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
     <Reference Include="WindowsInput, Version=1.0.4.0, Culture=neutral, PublicKeyToken=9b287f7dc5073cad, processorArchitecture=MSIL">
       <HintPath>..\packages\InputSimulator.1.0.4.0\lib\net20\WindowsInput.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\AppConfiguration.cs" />
+    <Compile Include="Services\Implementation\AppConfigurationService.cs" />
+    <Compile Include="Services\Implementation\AppConfigurationService720.cs" />
+    <Compile Include="Services\Interfaces\IAppConfigurationService.cs" />
     <Compile Include="Core\FishingBot.cs" />
     <Compile Include="Core\FishTracker.cs" />
     <Compile Include="Core\HookController.cs" />
@@ -164,19 +171,31 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Logo.ico" />
-    <Content Include="Resources\CatchNotification.png" />
-    <Content Include="Resources\Fish1.png" />
-    <Content Include="Resources\Fish2.png" />
-    <Content Include="Resources\Fish3.png" />
-    <Content Include="Resources\Fish4.png" />
-    <Content Include="Resources\Fish5.png" />
-    <Content Include="Resources\Fish6.png" />
-    <Content Include="Resources\FishAlert.png" />
-    <Content Include="Resources\Hook.png" />
-    <Content Include="Resources\Hook1.png" />
-    <Content Include="Resources\Hook2.png" />
-    <Content Include="Resources\Logo.png" />
-    <Content Include="Resources\MiniGame.png" />
+    <Content Include="Resources\Size1080\CatchNotification.png" />
+    <Content Include="Resources\Size1080\Fish1.png" />
+    <Content Include="Resources\Size1080\Fish2.png" />
+    <Content Include="Resources\Size1080\Fish3.png" />
+    <Content Include="Resources\Size1080\Fish4.png" />
+    <Content Include="Resources\Size1080\Fish5.png" />
+    <Content Include="Resources\Size1080\Fish6.png" />
+    <Content Include="Resources\Size1080\FishAlert.png" />
+    <Content Include="Resources\Size1080\Hook.png" />
+    <Content Include="Resources\Size1080\Hook1.png" />
+    <Content Include="Resources\Size1080\Hook2.png" />
+    <Content Include="Resources\Size1080\Logo.png" />
+    <Content Include="Resources\Size1080\MiniGame.png" />
+    <Content Include="Resources\Size720\CatchNotification.png" />
+    <Content Include="Resources\Size720\Fish1.png" />
+    <Content Include="Resources\Size720\Fish2.png" />
+    <Content Include="Resources\Size720\Fish3.png" />
+    <Content Include="Resources\Size720\Fish4.png" />
+    <Content Include="Resources\Size720\Fish5.png" />
+    <Content Include="Resources\Size720\Fish6.png" />
+    <Content Include="Resources\Size720\FishAlert.png" />
+    <Content Include="Resources\Size720\Hook.png" />
+    <Content Include="Resources\Size720\Hook1.png" />
+    <Content Include="Resources\Size720\Logo.png" />
+    <Content Include="Resources\Size720\MiniGame.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.8">
@@ -196,7 +215,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Configuration\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
